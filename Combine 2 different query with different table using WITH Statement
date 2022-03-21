@@ -1,0 +1,55 @@
+----From Query A-----
+Select distinct Membership_number, Name,
+	(Case 
+		When ItemCode = 'Delivery' Then 1
+		Else 0
+	End) As Delivery
+From dbo.z_membership_trxhistory
+Where (Case 
+		When ItemCode = 'Delivery' Then 1
+		Else 0
+	End) = 1
+
+-----From Query B-----
+SELECT Membership_number,
+	   Name,
+	   Max (Receipt_Date) recent_purchase,
+	   DATEDIFF(Day,Edit_date,GETDATE()) AS Account_Age,
+	   COUNT(TotalAmt) AS Total_Transaction,
+	   SUM(TotalAmt) AS Total_Amount          
+FROM dbo.z_membership_trxhistory
+Join PS_Member on PS_Member.Code = [z_membership_trxhistory].Membership_Number
+group by Membership_Number, Name, DATEDIFF(Day,Edit_date,GETDATE())
+
+
+-----Combine Query using WITH STATEMENT-----
+With TableNew_A as (   
+Select distinct Membership_number, Name,
+	(Case 
+		When ItemCode = 'Delivery' Then 1
+		Else 0
+	End) As Delivery
+From dbo.z_membership_trxhistory
+Where (Case 
+		When ItemCode = 'Delivery' Then 1
+		Else 0
+	End) = 1 
+),
+TableNew_B as (
+SELECT Membership_number,
+	   Name,
+	   Max (Receipt_Date) recent_purchase,
+	   DATEDIFF(Day,Edit_date,GETDATE()) AS Account_Age,
+	   COUNT(TotalAmt) AS Total_Transaction,
+	   SUM(TotalAmt) AS Total_Amount          
+FROM dbo.z_membership_trxhistory
+Join PS_Member on PS_Member.Code = [z_membership_trxhistory].Membership_Number
+group by Membership_Number, Name, DATEDIFF(Day,Edit_date,GETDATE())
+)
+#CREATE NEW QUERY FOR THE JOINT OUTCOME
+Select TableNew_B.Membership_number,
+	   TableNew_B.Name,
+	   TableNew_B.recent_purchase, TableNew_B.Account_Age, TableNew_B.Total_Transaction, TableNew_B.Total_Amount, 
+	   isnull(TableNew_A.Delivery,0) AS Delivery
+from TableNew_B
+full outer join TableNew_A on TableNew_B.Membership_Number = TableNew_A.Membership_Number

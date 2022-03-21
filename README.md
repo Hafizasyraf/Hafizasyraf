@@ -1,7 +1,7 @@
 - 👋 Hi, I’m @Hafizasyraf
 - 👀 I’m interested in Data Analyst
 - 🌱 I’m currently learning Statistical Programming
-- 💞️ I’m looking to collaborate on ...
+- 💞️ I’m looking to collaborate on Data Processing coding and ML Query
 - 📫 How to reach me hafizasyraf72@gmail.com
 
 <!---
